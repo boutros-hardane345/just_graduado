@@ -1,0 +1,19 @@
+{
+  "name": "invitation",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Graduation invitation with RSVP",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "mongodb": "^6.8.0"
+  }
+}

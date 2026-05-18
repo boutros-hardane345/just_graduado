@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Graduation Celebration | Ehmej | Black & Gold</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&family=Permanent+Marker&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+  <link rel="icon" type="image/jpeg" href="photo.jpg">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --gold: #d4af37;
+      --gold2: #f5d742;
+      --gold3: #b8860b;
+      --black: #000;
+      --dark: #0a0a0a;
+      --card: #0f0f0f;
+      --surface: #111111;
+    }
+
+    body {
+      background:
+        radial-gradient(1200px 600px at 50% -10%, rgba(212, 175, 55, 0.10), transparent 60%),
+        radial-gradient(900px 500px at 15% 110%, rgba(245, 215, 66, 0.08), transparent 60%),
+        var(--dark);
+      font-family: 'Montserrat', sans-serif;
+      padding: 1rem;
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: auto;
+    }
+
+    /* ── CANVAS LAYERS ── */
+    #bg-canvas,
+    #cursor-trail {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #cursor-trail {
+      z-index: 9999;
+    }
+
+    /* Confetti restricted to the invitation card */
+    #card-confetti {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--surface);
+      border-radius: 32px;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(212, 175, 55, 0.3);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Inner frame for a printed-card feel */
+    .page::after {
+      content: '';
+      position: absolute;
+      inset: 14px;
+      border-radius: 22px;
+      border: 1px solid rgba(212, 175, 55, 0.20);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── GLITTER BORDER ── */
+    .page::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 34px;
+      background: linear-gradient(45deg,
+          #d4af37 0%, transparent 20%,
+          #f5d742 40%, transparent 60%,
+          #d4af37 80%, transparent 100%);
+      background-size: 100% 100%;
+      /* Remove animated glitter border */
+      animation: none;
+      z-index: -1;
+    }
+
+    /* borderGlitter removed */
+
+    /* ── HERO ── */
+    .hero {
+      background: #000;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      color: var(--gold);
+      border-bottom: 3px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Moving star field in hero */
+    .hero-stars {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(1px 1px at 10% 20%, #d4af37 0%, transparent 100%),
+        radial-gradient(1px 1px at 30% 60%, #f5d742 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 10%, #fff 0%, transparent 100%),
+        radial-gradient(1px 1px at 75% 80%, #d4af37 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 35%, #f5d742 0%, transparent 100%),
+        radial-gradient(1px 1px at 20% 85%, #fff 0%, transparent 100%),
+        radial-gradient(1px 1px at 65% 50%, #d4af37 0%, transparent 100%);
+      animation: starFloat 8s linear infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes starFloat {
+      0% {
+        transform: translateY(0) scale(1)
+      }
+
+      100% {
+        transform: translateY(-10px) scale(1.05)
+      }
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.15), transparent);
+      /* Remove shimmer animation */
+      animation: none;
+      pointer-events: none;
+    }
+
+    /* heroShimmer removed */
+
+    /* ── PHOTO ── */
+    .hero-photo {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      cursor: pointer;
+      position: relative;
+      z-index: 2;
+      border: 3px solid var(--gold);
+      animation: photoPulse 2s ease-in-out infinite, photoSpin 20s linear infinite;
+      filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.6));
+      transition: filter 0.2s;
+    }
+
+    .hero-photo:hover {
+      filter: drop-shadow(0 0 28px rgba(212, 175, 55, 1)) brightness(1.1);
+      animation: photoPulse 0.4s ease-in-out infinite, photoSpin 20s linear infinite;
+    }
+
+    @keyframes photoPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.6), 0 0 20px rgba(212, 175, 55, 0.4)
+      }
+
+      50% {
+        box-shadow: 0 0 0 16px rgba(212, 175, 55, 0), 0 0 40px rgba(212, 175, 55, 0.8)
+      }
+    }
+
+    @keyframes photoSpin {
+      0% {
+        border-color: #d4af37
+      }
+
+      25% {
+        border-color: #f5d742
+      }
+
+      50% {
+        border-color: #fff
+      }
+
+      75% {
+        border-color: #b8860b
+      }
+
+      100% {
+        border-color: #d4af37
+      }
+    }
+
+    /* ring orbit around photo */
+    .photo-wrap {
+      position: relative;
+      flex-shrink: 0;
+      z-index: 2;
+      width: 100px;
+      height: 100px;
+    }
+
+    .orbit-ring {
+      position: absolute;
+      inset: -12px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: #d4af37;
+      border-right-color: #f5d742;
+      animation: orbitSpin 2s linear infinite;
+    }
+
+    .orbit-ring2 {
+      position: absolute;
+      inset: -20px;
+      border-radius: 50%;
+      border: 1px dashed rgba(212, 175, 55, 0.4);
+      animation: orbitSpin 5s linear infinite reverse;
+    }
+
+    @keyframes orbitSpin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .hero-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero .friends-style {
+      font-family: 'Permanent Marker', cursive;
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      color: #fff;
+      display: inline-block;
+      white-space: nowrap;
+      /* Typewriter effect removed to avoid invisible text on some devices */
+      border-right: none;
+      width: auto;
+      animation: none;
+    }
+
+    .hero .friends-style-small {
+      font-family: 'Permanent Marker', cursive;
+      font-size: 1.4rem;
+      letter-spacing: 2px;
+      color: #fff;
+      white-space: nowrap;
+      border-right: none;
+      width: auto;
+      animation: none;
+    }
+
+    /* (typewriter + cursor blink removed) */
+
+    .content {
+      padding: 1.8rem 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(50px) scale(0.97);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .scroll-reveal.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* ── LOGOS ── */
+    .logos-row {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin: 2rem 0 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--gold);
+    }
+
+    .logo-item {
+      text-align: center;
+      width: 120px;
+    }
+
+    .logo-item img {
+      width: 100%;
+      max-width: 100px;
+      height: 100px;
+      filter: drop-shadow(0 0 4px rgba(241, 196, 48, 1));
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s;
+    }
+
+    .logo-item img:hover {
+      transform: scale(1.2) rotate(-6deg);
+      filter: drop-shadow(0 0 18px rgba(241, 196, 48, 1)) brightness(1.2);
+    }
+
+    /* ── COUNTDOWN ── */
+    .countdown-card {
+      background: #1a1a1a;
+      border-radius: 30px;
+      padding: 1.2rem;
+      text-align: center;
+      margin-bottom: 2rem;
+      border: 1px solid var(--gold);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .countdown-card::before {
+      content: '';
+      font-size: 6rem;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.04;
+      pointer-events: none;
+    }
+
+    .countdown-card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      color: var(--gold);
+      margin: 0.3rem 0;
+    }
+
+    .live-timer {
+      display: flex;
+      justify-content: center;
+      gap: 0.8rem;
+      margin: 0.8rem 0 0.4rem;
+      flex-wrap: nowrap;
+    }
+
+    .timer-unit {
+      background: #000;
+      border: 1px solid var(--gold);
+      border-radius: 12px;
+      padding: 0.4rem 0.8rem;
+      text-align: center;
+      min-width: 64px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .timer-unit::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(212, 175, 55, 0.08), transparent);
+      pointer-events: none;
+    }
+
+    .t-num {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--gold2);
+      font-family: 'Montserrat', monospace;
+      letter-spacing: 2px;
+      display: block;
+      transition: transform 0.12s;
+    }
+
+    .t-num.flip {
+      transform: scaleY(0);
+    }
+
+    .t-label {
+      font-size: 0.6rem;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+
+    /* ── INFO CARDS ── */
+    .info-card {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 1.5rem;
+      border-left: 6px solid var(--gold);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      color: #fff;
+      transition: box-shadow 0.3s, transform 0.3s, border-left-color 0.4s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* A more "crazy" hero-card treatment for the Photoshoot section (no emoji) */
+    .info-card--photoshoot {
+      border-left-color: var(--gold2);
+      background:
+        radial-gradient(1200px 220px at 10% 0%, rgba(212, 175, 55, 0.12), transparent 60%),
+        radial-gradient(900px 260px at 90% 20%, rgba(245, 215, 66, 0.10), transparent 60%),
+        linear-gradient(180deg, #111, #0b0b0b);
+    }
+
+    .info-card--photoshoot::after {
+      content: '';
+      position: absolute;
+      inset: -40% -60%;
+      background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.08), transparent);
+      transform: rotate(12deg);
+      animation: photoCardSheen 5.5s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes photoCardSheen {
+      0% {
+        transform: translateX(-40%) rotate(12deg)
+      }
+
+      100% {
+        transform: translateX(40%) rotate(12deg)
+      }
+    }
+
+    .info-card--photoshoot h2 {
+      position: relative;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .info-card--photoshoot h2::after {
+      content: '';
+      display: block;
+      height: 2px;
+      width: 84px;
+      margin-top: 10px;
+      background: linear-gradient(90deg, var(--gold2), transparent);
+      opacity: 0.9;
+    }
+
+    .info-card--photoshoot .info-line {
+      position: relative;
+      padding-left: 18px;
+    }
+
+    .info-card--photoshoot .info-line::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.78em;
+      width: 8px;
+      height: 8px;
+      transform: translateY(-50%) rotate(45deg);
+      border: 1px solid rgba(245, 215, 66, 0.9);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.25);
+    }
+
+    .info-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 200%;
+      background: conic-gradient(transparent 0deg, rgba(212, 175, 55, 0.04) 60deg, transparent 120deg);
+      /* Remove rotating background sheen */
+      animation: none;
+      pointer-events: none;
+    }
+
+    /* cardRotate removed */
+    .info-card:hover {
+      box-shadow: 0 12px 40px rgba(212, 175, 55, 0.25);
+      transform: translateX(6px) translateY(-2px);
+      border-left-color: var(--gold2);
+    }
+
+    .info-card h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.7rem;
+      font-weight: 600;
+      color: var(--gold);
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-line {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.95rem;
+      margin: 12px 0;
+      flex-wrap: wrap;
+      color: #fff;
+    }
+
+    .info-line .emoji {
+      font-size: 1.3rem;
+      min-width: 36px;
+      animation: none;
+    }
+
+    .dresscode {
+      background: var(--gold);
+      color: #000;
+      padding: 4px 14px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-block;
+      animation: badgePulse 2s ease-in-out infinite;
+    }
+
+    @keyframes badgePulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.5)
+      }
+
+      50% {
+        box-shadow: 0 0 0 6px rgba(212, 175, 55, 0)
+      }
+    }
+
+
+    a.footer-admin,
+    a.footer-admin:link,
+    a.footer-admin:visited,
+    a.footer-admin:hover,
+    a.footer-admin:active,
+    a.footer-admin:focus {
+      color: var(--gold2) !important;
+      text-decoration: none !important;
+      border: 0 !important;
+      opacity: 0.55;
+      font-weight: 300;
+      letter-spacing: 0.5px;
+      outline: none;
+    }
+
+    a.footer-admin:hover {
+      opacity: 0.95;
+    }
+
+    .is-hidden {
+      display: none !important;
+    }
+
+    /* ── RSVP ── */
+    .rsvp-box {
+      background: #1c1c1c;
+      border-radius: 24px;
+      padding: 1.2rem;
+      text-align: center;
+      margin: 1.5rem 0;
+      border: 1px solid var(--gold);
+      color: #fff;
+      animation: rsvpGlow 2s ease-in-out infinite;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .rsvp-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(45deg, transparent 30%, rgba(212, 175, 55, 0.05) 50%, transparent 70%);
+      background-size: 200% 200%;
+      /* Remove RSVP shine animation */
+      animation: none;
+    }
+
+    /* rsvpShine removed */
+    @keyframes rsvpGlow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0.2), inset 0 0 20px rgba(212, 175, 55, 0.02)
+      }
+
+      50% {
+        box-shadow: 0 0 40px rgba(212, 175, 55, 0.5), inset 0 0 40px rgba(212, 175, 55, 0.06)
+      }
+    }
+
+    .rsvp-box strong {
+      color: var(--gold);
+      font-size: 1rem;
+    }
+
+    .btn-join {
+      background: linear-gradient(135deg, #d4af37, #f5d742, #d4af37);
+      background-size: 200% 200%;
+      color: #000;
+      border: none;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 14px 24px;
+      border-radius: 50px;
+      cursor: pointer;
+      width: 100%;
+      max-width: 280px;
+      margin: 1rem auto 0;
+      display: block;
+      letter-spacing: 1px;
+      text-decoration: none;
+      line-height: 1.5;
+      /* Remove background shine animation */
+      animation: btnBounce 1.8s ease-in-out infinite;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .btn-join::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transform: translateX(-100%);
+      /* Remove swipe highlight animation */
+      animation: none;
+    }
+
+    @keyframes btnBounce {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-7px);
+        box-shadow: 0 16px 32px rgba(212, 175, 55, 0.6)
+      }
+    }
+
+    /* btnShine + btnSwipe removed */
+    .btn-join:hover {
+      animation: none;
+      transform: scale(1.08);
+      background: linear-gradient(135deg, #f5d742, #fff176, #f5d742);
+      box-shadow: 0 0 30px rgba(212, 175, 55, 0.8);
+    }
+
+    .btn-disabled {
+      background: #5a5a5a;
+      color: #ccc;
+      cursor: not-allowed;
+      box-shadow: none;
+      pointer-events: none;
+      opacity: 0.6;
+      animation: none;
+    }
+
+    .deadline-warning {
+      background: #2a1e1a;
+      border-left: 6px solid #c0392b;
+      padding: 0.8rem;
+      border-radius: 16px;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: #f0b27a;
+    }
+
+    .success-message {
+      background: #1e2a1a;
+      border-left: 6px solid var(--gold);
+      padding: 0.8rem;
+      border-radius: 16px;
+      margin-top: 1rem;
+      display: none;
+      color: #e0c87c;
+      animation: fadeSlideIn 0.5s ease;
+    }
+
+    .error-message {
+      background: #2a1f1f;
+      border-left: 6px solid #c0392b;
+      padding: 0.8rem;
+      border-radius: 16px;
+      margin-top: 1rem;
+      display: none;
+      color: #f0b27a;
+      animation: fadeSlideIn 0.5s ease;
+    }
+
+    .rsvp-form {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 0.8rem;
+      max-width: 520px;
+      margin: 0.9rem auto 0;
+    }
+
+    .rsvp-row {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .rsvp-row label {
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      color: var(--gold);
+      text-transform: uppercase;
+      text-align: left;
+    }
+
+    .rsvp-input,
+    .rsvp-select,
+    .rsvp-textarea {
+      width: 100%;
+      background: #000;
+      border: 1px solid rgba(212, 175, 55, 0.55);
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: 14px;
+      outline: none;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .rsvp-textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .rsvp-input:focus,
+    .rsvp-select:focus,
+    .rsvp-textarea:focus {
+      border-color: var(--gold2);
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
+    }
+
+    .rsvp-radio-group {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .rsvp-radio {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      border: none;
+      padding: 4px 6px;
+      border-radius: 999px;
+      cursor: pointer;
+      user-select: none;
+      color: #fff;
+    }
+
+    .rsvp-radio input {
+      accent-color: var(--gold2);
+    }
+
+    .rsvp-guest-list {
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .rsvp-help {
+      font-size: 0.78rem;
+      color: #d7c48b;
+      opacity: 0.9;
+      text-align: left;
+      line-height: 1.5;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid rgba(212, 175, 55, 0.75);
+      color: var(--gold2);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 12px 20px;
+      border-radius: 50px;
+      cursor: pointer;
+      width: 100%;
+      max-width: 280px;
+      margin: 0.6rem auto 0;
+      display: block;
+      letter-spacing: 1px;
+      text-decoration: none;
+      line-height: 1.5;
+      transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-secondary:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 24px rgba(212, 175, 55, 0.28);
+      background: rgba(212, 175, 55, 0.06);
+    }
+
+    .btn-secondary[aria-disabled="true"] {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    @keyframes fadeSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    footer {
+      background: #050505;
+      color: #b89a3a;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.7rem;
+      font-weight: 300;
+      border-top: 1px solid var(--gold);
+    }
+
+    hr {
+      margin: 1.2rem 0;
+      border: 0;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+    }
+
+    .deadline-note {
+      font-size: 0.75rem;
+      color: var(--gold);
+      margin-top: 0.8rem;
+    }
+
+    /* ── CLOSING ── */
+    .closing {
+      text-align: center;
+      font-family: 'Permanent Marker', cursive;
+      font-size: 1.2rem;
+      font-weight: 400;
+      letter-spacing: 1px;
+      color: #000;
+      background: linear-gradient(180deg, rgba(245, 215, 66, 0.92), rgba(212, 175, 55, 0.88));
+      border-top: 1px solid rgba(0, 0, 0, 0.25);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+      padding: 1.05rem 1rem;
+      margin: 0;
+    }
+
+    .closing .spin {
+      display: inline-block;
+      animation: none;
+    }
+
+    .closing .bounce {
+      display: inline-block;
+      animation: bounceEmoji 1s ease-in-out infinite;
+    }
+
+    @keyframes bounceEmoji {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-6px)
+      }
+    }
+
+
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #000;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 9998;
+      white-space: nowrap;
+    }
+
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── MOBILE ── */
+    @media(max-width:600px) {
+      body {
+        padding: 0.5rem;
+      }
+
+      .content {
+        padding: 1.2rem;
+      }
+
+      .page::after {
+        inset: 10px;
+        border-radius: 20px;
+      }
+
+      .closing {
+        margin: 0;
+      }
+
+      .hero {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .hero-photo,
+      .photo-wrap {
+        width: 80px;
+        height: 80px;
+      }
+
+      .hero .friends-style {
+        font-size: 1.3rem;
+      }
+
+      .hero .friends-style-small {
+        font-size: 1.1rem;
+      }
+
+      .live-timer {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+      }
+
+      .timer-unit {
+        min-width: 0;
+        padding: 0.35rem 0.5rem;
+      }
+
+      .t-num {
+        font-size: 1.45rem;
+        letter-spacing: 1px;
+      }
+
+      .info-card h2 {
+        font-size: 1.4rem;
+      }
+
+      .info-line {
+        font-size: 0.85rem;
+      }
+
+      .btn-join {
+        font-size: 0.9rem;
+        padding: 10px 16px;
+      }
+
+      .logo-item {
+        width: 100px;
+      }
+
+      .logo-item img {
+        max-width: 80px;
+      }
+    }
+
+    @media(max-width:480px) {
+      .logos-row {
+        gap: 1rem;
+      }
+
+      .info-card {
+        padding: 1rem;
+      }
+
+      .countdown-card {
+        padding: 0.8rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+  <canvas id="cursor-trail" style="display:none;"></canvas>
+  <div id="toast">Let's celebrate!</div>
+
+  <div class="page">
+
+    <!-- Confetti canvas clipped to card -->
+    <canvas id="card-confetti"></canvas>
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-stars"></div>
+      <div class="photo-wrap">
+        <div class="orbit-ring"></div>
+        <div class="orbit-ring2"></div>
+        <img src="photo.jpg" alt="Photo" class="hero-photo" id="heroPhoto" title="Tap me">
+      </div>
+      <div class="hero-text">
+        <div class="friends-style">SEASON : 20 - EPISODE : 26</div>
+        <div class="friends-style-small">THE • ONE • WHERE • HE • GRADUATE</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- COUNTDOWN -->
+      <div class="countdown-card scroll-reveal">
+        <h3>Counting down to the big day</h3>
+        <div class="live-timer">
+          <div class="timer-unit"><span class="t-num" id="t-days">--</span><span class="t-label">Days</span></div>
+          <div class="timer-unit"><span class="t-num" id="t-hours">--</span><span class="t-label">Hours</span></div>
+          <div class="timer-unit"><span class="t-num" id="t-mins">--</span><span class="t-label">Minutes</span></div>
+          <div class="timer-unit"><span class="t-num" id="t-secs">--</span><span class="t-label">Seconds</span></div>
+        </div>
+        <h3 class="countdown-subtitle" style="margin-top:0.4rem;">until we celebrate!</h3>
+      </div>
+
+      <!-- Event details -->
+      <div class="info-card info-card--photoshoot scroll-reveal">
+        <h2>Photoshoot in Ehmej</h2>
+        <div class="info-line">Thursday, 18 June 2026</div>
+        <div class="info-line">10:00 AM – 12:30 PM</div>
+        <div class="info-line">Ehmej</div>
+        <div class="info-line"><span class="dresscode">Dress code: Smart casual</span> – elegant & comfortable</div>
+      </div>
+
+      <!-- Drinks & Appetizers -->
+      <div class="info-card scroll-reveal">
+        <h2>Drinks & Appetizers</h2>
+        <p style="line-height:2.2;">
+          Drinks courtesy of <strong style="color:var(--gold);">The Collector Bar</strong><br>
+          Appetizers by <strong style="color:var(--gold);">Kammesh</strong><br>
+          Homemade sweets & savory bites<br><br>
+          Celebrate with fine flavours and warm company.
+        </p>
+      </div>
+
+      <!-- RSVP -->
+      <div class="rsvp-box scroll-reveal">
+        <strong>RSVP required</strong><br>
+        Please confirm your attendance below.
+
+        <form id="rsvpForm" class="rsvp-form" autocomplete="on" novalidate>
+          <input type="text" id="hpField" name="hp" tabindex="-1" autocomplete="off" class="is-hidden"
+            aria-hidden="true">
+
+          <div class="rsvp-row">
+            <div class="rsvp-radio-group">
+              <label class="rsvp-radio"><input type="radio" name="status" value="yes"> Coming</label>
+              <label class="rsvp-radio"><input type="radio" name="status" value="no"> Not coming</label>
+            </div>
+          </div>
+
+          <div class="rsvp-row">
+            <label for="inviterName">Your name</label>
+            <input class="rsvp-input" id="inviterName" name="inviterName" type="text" placeholder="Full name" required>
+          </div>
+
+          <div class="rsvp-row">
+            <label for="inviterPhone">Phone</label>
+            <input class="rsvp-input" id="inviterPhone" name="inviterPhone" type="text" placeholder="Phone number"
+              required>
+            <div class="rsvp-help">Spaces are ignored (for example: "81 239 091" becomes "81239091").</div>
+          </div>
+
+          <div class="rsvp-row">
+            <label for="partySize">Number of persons (includes you)</label>
+            <input class="rsvp-input" id="partySize" name="partySize" type="number" inputmode="numeric" min="1" step="1"
+              value="1" disabled>
+          </div>
+
+          <div class="rsvp-row is-hidden" id="guestNamesRow">
+            <label>Guest name(s)</label>
+            <div id="guestNames" class="rsvp-guest-list"></div>
+          </div>
+
+          <button id="rsvpSubmit" class="btn-join" type="submit">Submit RSVP</button>
+
+          <a id="joinGroupBtn" class="btn-secondary is-hidden" href="https://chat.whatsapp.com/KzUVoeTAuCgCxOpV3a6MCr"
+            target="_blank" rel="noopener noreferrer">Join WhatsApp group</a>
+        </form>
+
+        <div id="rsvpMessage" class="success-message"></div>
+        <div id="rsvpError" class="error-message"></div>
+        <div id="deadlineMessage" class="deadline-warning is-hidden">RSVP is closed. The deadline (15 June 2026) has
+          passed.</div>
+        <div class="deadline-note">Deadline to RSVP: <strong>15 June 2026</strong>.</div>
+      </div>
+
+      <hr>
+      <div class="closing scroll-reveal">
+        Come with positive energy, your brightest smile, and a heart full of joy.<br>
+        I can't wait to celebrate this milestone with you.<br>
+        See you in Ehmej.
+      </div>
+
+      <!-- Logos -->
+      <div class="logos-row scroll-reveal">
+        <div class="logo-item">
+          <img src="kamesh.jpg" alt="Kammesh" onclick="logoParty(this)">
+        </div>
+        <div class="logo-item">
+          <img src="collectorbar.jpg" alt="The Collector Bar" onclick="logoParty(this)">
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Ehmej • 18 June 2026 • 10:00 – 12:30 •
+      <a href="/admin/login" target="_blank" rel="noopener noreferrer" class="footer-admin">Boutros Hardane</a>
+    </footer>
+  </div>
+
+  <script>
+    const RSVP_DEADLINE_ISO = "2026-06-15T23:59:59+03:00";
+    const RSVP_DEADLINE = new Date(RSVP_DEADLINE_ISO);
+    const EVENT_DATE = new Date(2026, 5, 18, 10, 0, 0);
+    const GOLD = ['#d4af37', '#f5d742', '#b8860b', '#ffffff', '#e5c87b', '#fffacd'];
+
+    // Confetti clipped to the invitation card
+    const cardConfetti = (function () {
+      const c = document.getElementById('card-confetti');
+      if (!c || typeof confetti !== 'function') return null;
+      // Let the library handle canvas sizing reliably.
+      const inst = confetti.create(c, { resize: true, useWorker: false });
+      return (opts) => inst({ colors: GOLD, ...opts });
+    })();
+
+    function fireCardConfetti(opts) {
+      if (cardConfetti) return cardConfetti(opts);
+      // Fallback to full-page confetti
+      return confetti({ colors: GOLD, ...opts });
+    }
+
+    function isAfterDeadline() { return new Date() > RSVP_DEADLINE; }
+
+    // ── LIVE COUNTDOWN ──────────────────────────────────
+    function updateCountdown() {
+      const diff = EVENT_DATE - new Date();
+      if (diff <= 0) { ['days', 'hours', 'mins', 'secs'].forEach(id => document.getElementById('t-' + id).innerText = '00'); return; }
+      const pad = n => String(n).padStart(2, '0');
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      const secs = Math.floor((diff % 60000) / 1000);
+      const secEl = document.getElementById('t-secs');
+      secEl.classList.add('flip');
+      setTimeout(() => { secEl.innerText = pad(secs); secEl.classList.remove('flip'); }, 75);
+      document.getElementById('t-days').innerText = pad(days);
+      document.getElementById('t-hours').innerText = pad(hours);
+      document.getElementById('t-mins').innerText = pad(mins);
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    // ── SCROLL REVEAL ────────────────────────────────────
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach((e, i) => { if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i * 130); obs.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.scroll-reveal').forEach(el => obs.observe(el));
+
+    // ── FLOATING PARTICLES (stars background) ─────────────
+    (function () {
+      const c = document.getElementById('bg-canvas');
+      const ctx = c.getContext('2d');
+      let W, H, pts = [];
+      function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
+      resize(); window.addEventListener('resize', resize);
+      for (let i = 0; i < 70; i++) pts.push({
+        x: Math.random() * 2000, y: Math.random() * 2000,
+        r: Math.random() * 2.5 + 0.3,
+        dx: (Math.random() - 0.5) * 0.5, dy: (Math.random() - 0.5) * 0.5,
+        color: GOLD[Math.floor(Math.random() * GOLD.length)],
+        a: Math.random() * 0.5 + 0.05, pulse: Math.random() * Math.PI * 2,
+        shape: Math.random() > 0.6 ? 'star' : 'circle'
+      });
+      function star(ctx, x, y, r, a) {
+        ctx.save(); ctx.translate(x, y); ctx.rotate(a);
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+          ctx.lineTo(Math.cos((18 + i * 72) * Math.PI / 180) * r, -Math.sin((18 + i * 72) * Math.PI / 180) * r);
+          ctx.lineTo(Math.cos((54 + i * 72) * Math.PI / 180) * (r * 0.4), -Math.sin((54 + i * 72) * Math.PI / 180) * (r * 0.4));
+        }
+        ctx.closePath(); ctx.restore();
+      }
+      let tick = 0;
+      function draw() {
+        ctx.clearRect(0, 0, W, H); tick += 0.02;
+        pts.forEach(p => {
+          p.pulse += 0.025; p.x += p.dx; p.y += p.dy;
+          if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+          if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+          ctx.globalAlpha = p.a * (0.5 + 0.5 * Math.abs(Math.sin(p.pulse)));
+          ctx.fillStyle = p.color;
+          if (p.shape === 'star') { star(ctx, p.x, p.y, p.r * 2, tick); ctx.fill(); }
+          else { ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill(); }
+        });
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    // ── CURSOR TRAIL (disabled for card-like feel) ────────
+    /*
+    (function(){
+      const c = document.getElementById('cursor-trail');
+      const ctx = c.getContext('2d');
+      let W,H; const trail=[];
+      function resize(){ W=c.width=window.innerWidth; H=c.height=window.innerHeight; }
+      resize(); window.addEventListener('resize',resize);
+      window.addEventListener('mousemove',e=>{
+        for(let i=0;i<3;i++) trail.push({
+          x:e.clientX+(Math.random()-0.5)*10,
+          y:e.clientY+(Math.random()-0.5)*10,
+          r:Math.random()*4+2,
+          a:0.9, color:GOLD[Math.floor(Math.random()*GOLD.length)]
+        });
+      });
+      function draw(){
+        ctx.clearRect(0,0,W,H);
+        for(let i=trail.length-1;i>=0;i--){
+          const p=trail[i];
+          ctx.globalAlpha=p.a;
+          ctx.fillStyle=p.color;
+          ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+          p.a-=0.04; p.r*=0.92;
+          if(p.a<=0) trail.splice(i,1);
+        }
+        ctx.globalAlpha=1;
+        requestAnimationFrame(draw);
+      }
+      draw();
+     })();
+    */
+
+    // ── FALLING CONFETTI (disabled for card-like feel) ───
+    function fallingConfetti() {
+      // Longer-lived particles so they reach the bottom of the card.
+      fireCardConfetti({ particleCount: 2, angle: 90, spread: 40, origin: { x: Math.random() * 0.3, y: 0 }, gravity: 0.95, scalar: 1.1, drift: 0.2, ticks: 900 });
+      fireCardConfetti({ particleCount: 3, angle: 90, spread: 60, origin: { x: 0.3 + Math.random() * 0.4, y: 0 }, gravity: 0.90, scalar: 1.0, drift: Math.random() * 0.5 - 0.25, ticks: 950 });
+      fireCardConfetti({ particleCount: 2, angle: 90, spread: 40, origin: { x: 0.7 + Math.random() * 0.3, y: 0 }, gravity: 0.95, scalar: 1.1, drift: -0.2, ticks: 900 });
+    }
+    // Run only when user hasn't requested reduced motion
+    if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+      setInterval(fallingConfetti, 300);
+    }
+
+    // ── PHOTO CLICK → MEGA PARTY ─────────────────────────
+    document.getElementById('heroPhoto').addEventListener('click', function () {
+      this.style.animation = 'none';
+      let deg = 0; const shake = setInterval(() => { deg = (deg === 0 ? -15 : deg < 0 ? 15 : deg > 0 ? -15 : 0); this.style.transform = `scale(1.2) rotate(${deg}deg)`; }, 80);
+      setTimeout(() => { clearInterval(shake); this.style.transform = ''; this.style.animation = 'photoPulse 2s ease-in-out infinite, photoSpin 20s linear infinite'; }, 500);
+
+      fireCardConfetti({ particleCount: 250, spread: 180, origin: { x: 0.5, y: 0.05 }, startVelocity: 55, gravity: 0.8, scalar: 1.3, ticks: 500 });
+      setTimeout(() => {
+        fireCardConfetti({ particleCount: 120, spread: 90, angle: 60, origin: { x: 0, y: 0.3 }, startVelocity: 40, ticks: 350 });
+        fireCardConfetti({ particleCount: 120, spread: 90, angle: 120, origin: { x: 1, y: 0.3 }, startVelocity: 40, ticks: 350 });
+      }, 250);
+      setTimeout(() => fireCardConfetti({ particleCount: 200, spread: 360, origin: { x: 0.5, y: 0.5 }, startVelocity: 15, gravity: 0.3, scalar: 0.8, ticks: 600 }), 600);
+      setTimeout(() => {
+        fireCardConfetti({ particleCount: 80, spread: 60, origin: { x: 0.2, y: 0.2 }, startVelocity: 30 });
+        fireCardConfetti({ particleCount: 80, spread: 60, origin: { x: 0.8, y: 0.2 }, startVelocity: 30 });
+      }, 900);
+    });
+
+    // ── LOGO PARTY ───────────────────────────────────────
+    function logoParty(el) {
+      el.style.transform = 'scale(1.4) rotate(720deg)';
+      el.style.transition = 'transform 0.6s cubic-bezier(0.34,1.56,0.64,1)';
+      setTimeout(() => { el.style.transform = ''; }, 700);
+      const rect = el.getBoundingClientRect();
+      const x = (rect.left + rect.width / 2) / window.innerWidth;
+      const y = (rect.top + rect.height / 2) / window.innerHeight;
+      fireCardConfetti({ particleCount: 100, spread: 120, origin: { x, y }, startVelocity: 30, ticks: 300 });
+    }
+
+    // ── FIREWORKS ────────────────────────────────────────
+    function launchFireworks() {
+      let count = 0;
+      const interval = setInterval(() => {
+        const x = Math.random(); const y = Math.random() * 0.6;
+        fireCardConfetti({ particleCount: 60, spread: 360, origin: { x, y }, startVelocity: 25 + Math.random() * 20, gravity: 0.4, scalar: 0.9, ticks: 400 });
+        count++;
+        if (count >= 12) clearInterval(interval);
+      }, 180);
+      showToast('Fireworks');
+    }
+
+    // ── TOAST ────────────────────────────────────────────
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg; t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ── RSVP FORM (MongoDB-backed via API) ────────────────
+    (function initRsvpForm() {
+      const form = document.getElementById('rsvpForm');
+      const deadlineDiv = document.getElementById('deadlineMessage');
+      const msgDiv = document.getElementById('rsvpMessage');
+      const errDiv = document.getElementById('rsvpError');
+      const joinBtn = document.getElementById('joinGroupBtn');
+      const partySizeEl = document.getElementById('partySize');
+      const guestRow = document.getElementById('guestNamesRow');
+      const guestWrap = document.getElementById('guestNames');
+      const submitBtn = document.getElementById('rsvpSubmit');
+
+      function resetMessages() {
+        msgDiv.style.display = 'none'; msgDiv.textContent = '';
+        errDiv.style.display = 'none'; errDiv.textContent = '';
+      }
+      function showError(message) {
+        errDiv.textContent = message;
+        errDiv.style.display = 'block';
+      }
+      function showSuccess(message) {
+        msgDiv.textContent = message;
+        msgDiv.style.display = 'block';
+      }
+
+      function normalizePhone(s) {
+        return String(s || '').trim().replace(/\s+/g, '');
+      }
+
+      function setDisabledAll(disabled) {
+        Array.from(form.elements).forEach(el => { el.disabled = disabled; });
+        if (disabled) {
+          joinBtn.style.display = 'none';
+          joinBtn.setAttribute('aria-disabled', 'true');
+          submitBtn.classList.add('btn-disabled');
+        } else {
+          joinBtn.removeAttribute('aria-disabled');
+          submitBtn.classList.remove('btn-disabled');
+        }
+      }
+
+      function getStatus() {
+        const checked = form.querySelector('input[name="status"]:checked');
+        return checked ? checked.value : '';
+      }
+
+      function renderGuestInputs() {
+        const status = getStatus();
+        const partySize = parseInt(String(partySizeEl.value || '1'), 10);
+        guestWrap.innerHTML = '';
+        guestRow.classList.add('is-hidden');
+        if (status !== 'yes') return;
+        if (!Number.isFinite(partySize) || partySize <= 1) return;
+        guestRow.classList.remove('is-hidden');
+        const count = partySize - 1;
+        for (let i = 0; i < count; i++) {
+          const input = document.createElement('input');
+          input.className = 'rsvp-input';
+          input.type = 'text';
+          input.placeholder = `Guest ${i + 1} name`;
+          input.required = true;
+          input.dataset.guest = '1';
+          guestWrap.appendChild(input);
+        }
+      }
+
+      function onStatusChange() {
+        resetMessages();
+        joinBtn.classList.add('is-hidden');
+
+        const status = getStatus();
+        if (status === 'yes') {
+          partySizeEl.disabled = false;
+          if (!partySizeEl.value) partySizeEl.value = '1';
+        } else {
+          partySizeEl.disabled = true;
+          partySizeEl.value = '1';
+        }
+        renderGuestInputs();
+      }
+
+      function enforceDeadlineUi() {
+        if (isAfterDeadline()) {
+          setDisabledAll(true);
+          deadlineDiv.classList.remove('is-hidden');
+          resetMessages();
+          showError('RSVP unavailable (deadline passed).');
+          return true;
+        }
+        deadlineDiv.classList.add('is-hidden');
+        return false;
+      }
+
+      function enforceHostedUi() {
+        if (location.protocol === 'file:') {
+          setDisabledAll(true);
+          deadlineDiv.classList.add('is-hidden');
+          resetMessages();
+          showError('RSVP form is unavailable when opened as a local file. Please open the website link (https) or run the local server (http://localhost:3000).');
+          return true;
+        }
+        return false;
+      }
+
+      form.addEventListener('change', (e) => {
+        if (e.target && e.target.name === 'status') onStatusChange();
+      });
+      partySizeEl.addEventListener('input', () => { resetMessages(); joinBtn.style.display = 'none'; renderGuestInputs(); });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        resetMessages();
+        joinBtn.classList.add('is-hidden');
+
+        if (enforceDeadlineUi()) return;
+
+        const status = getStatus();
+        const inviterName = String(form.inviterName.value || '').trim();
+        const inviterPhone = normalizePhone(form.inviterPhone.value);
+        const hp = String(form.hp?.value || '').trim();
+        const partySize = status === 'yes' ? parseInt(String(partySizeEl.value || '1'), 10) : 0;
+
+        const guestNames = Array.from(guestWrap.querySelectorAll('input[data-guest]'))
+          .map(i => String(i.value || '').trim())
+          .filter(Boolean);
+
+        if (status !== 'yes' && status !== 'no') return showError('Please select Coming or Not coming.');
+        if (!inviterName) return showError('Please enter your name.');
+        if (!inviterPhone) return showError('Please enter your phone.');
+        if (status === 'yes') {
+          if (!Number.isFinite(partySize) || partySize < 1) return showError('Party size must be at least 1.');
+          if (partySize > 1 && guestNames.length !== partySize - 1) return showError(`Please enter exactly ${partySize - 1} guest name(s).`);
+          if (partySize === 1 && guestNames.length !== 0) return showError('Guest names must be empty when party size is 1.');
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.classList.add('btn-disabled');
+        try {
+          const resp = await fetch('/api/rsvp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status, inviterName, inviterPhone, partySize, guestNames, hp })
+          });
+          const data = await resp.json().catch(() => ({ ok: false, error: 'Invalid server response.' }));
+          if (!resp.ok || !data.ok) {
+            return showError(data && data.error ? data.error : 'Submission failed. Please try again.');
+          }
+
+          if (status === 'yes') {
+            showSuccess('✓ RSVP saved. See you on 18 June in Ehmej!');
+            joinBtn.classList.remove('is-hidden');
+            fireCardConfetti({ particleCount: 200, spread: 130, origin: { x: 0.5, y: 0.7 }, startVelocity: 45, ticks: 400 });
+            setTimeout(() => fireCardConfetti({ particleCount: 100, spread: 360, origin: { x: 0.5, y: 0.5 }, startVelocity: 20, gravity: 0.3, ticks: 500 }), 400);
+            showToast('See you in Ehmej');
+          } else {
+            showSuccess("✓ Thanks for letting me know. We'll miss you!");
+            showToast("Thanks for the update");
+          }
+        } catch (_err) {
+          showError('Network error. Please try again.');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('btn-disabled');
+        }
+      });
+
+      // Initial state
+      if (!enforceHostedUi()) {
+        enforceDeadlineUi();
+        onStatusChange();
+      }
+    })();
+
+
+
+    // ── DOUBLE CLICK ANYWHERE → MINI BURST ───────────────
+    document.addEventListener('dblclick', e => {
+      const x = e.clientX / window.innerWidth;
+      const y = e.clientY / window.innerHeight;
+      fireCardConfetti({ particleCount: 60, spread: 80, origin: { x, y }, startVelocity: 25, ticks: 250 });
+    });
+  </script>
+</body>
+
+</html>
