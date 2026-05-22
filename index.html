@@ -292,7 +292,7 @@
 
     .hero .friends-style {
       font-family: 'Permanent Marker', cursive;
-      font-size: 1.8rem;
+      font-size: 1.35rem;
       letter-spacing: 2px;
       color: #fff;
       display: inline-block;
@@ -305,13 +305,40 @@
 
     .hero .friends-style-small {
       font-family: 'Permanent Marker', cursive;
-      font-size: 1.4rem;
-      letter-spacing: 2px;
+      font-size: 2.25rem;
+      line-height: 1.05;
+      letter-spacing: 1.6px;
       color: #fff;
       white-space: nowrap;
       border-right: none;
       width: auto;
       animation: none;
+    }
+
+    /* Friends-style colored dot separators */
+    .hero .f-dot {
+      display: inline-block;
+      width: 0.62em;
+      height: 0.62em;
+      border-radius: 999px;
+      margin: 0 0.45rem;
+      transform: translateY(0.06em);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.10);
+    }
+
+    .hero .f-red {
+      background: #e94b3c;
+      color: #e94b3c;
+    }
+
+    .hero .f-yellow {
+      background: #f2c94c;
+      color: #f2c94c;
+    }
+
+    .hero .f-blue {
+      background: #2f80ed;
+      color: #2f80ed;
     }
 
     /* (typewriter + cursor blink removed) */
@@ -972,11 +999,11 @@
       }
 
       .hero .friends-style {
-        font-size: 1.3rem;
+        font-size: 1.05rem;
       }
 
       .hero .friends-style-small {
-        font-size: 1.1rem;
+        font-size: 1.7rem;
       }
 
       .live-timer {
@@ -1039,11 +1066,23 @@
 
 <body>
 
+  <audio id="bgMusic" src="music.mp3" preload="auto" loop playsinline autoplay muted></audio>
+
+  <div id="startOverlay" style="position:fixed; inset:0; z-index:10001; display:flex; align-items:center; justify-content:center; padding:18px; background:radial-gradient(1200px 600px at 50% -10%, rgba(255, 255, 255, 0.55), transparent 60%), radial-gradient(900px 500px at 15% 110%, rgba(255, 255, 255, 0.35), transparent 60%), linear-gradient(135deg, rgba(245, 215, 66, 0.96), rgba(212, 175, 55, 0.90));">
+    <div style="width:min(520px, 100%); border-radius:26px; border:1px solid rgba(212,175,55,0.28); background:linear-gradient(180deg, rgba(17,17,17,0.95), rgba(7,7,7,0.92)); box-shadow:0 26px 70px rgba(0,0,0,0.72); padding:20px 18px; text-align:center;">
+      <div style="font-family:'Permanent Marker', cursive; color:#fff; font-size:1.55rem;">I'll be there for you</div>
+      <div style="margin-top:10px; color:rgba(245,215,66,0.92); font-weight:600;">Tap to open the invitation</div>
+      <button id="startBtn" type="button" style="margin-top:16px; width:100%; border:1px solid rgba(0,0,0,0.28); border-radius:999px; padding:14px 18px; cursor:pointer; background:#000; color:#f5d742; font-weight:900;">
+        OPEN
+      </button>
+    </div>
+  </div>
+
   <canvas id="bg-canvas"></canvas>
   <canvas id="cursor-trail" style="display:none;"></canvas>
   <div id="toast">Let's celebrate!</div>
 
-  <div class="page">
+  <div class="page" id="invitationPage" style="visibility:hidden;">
 
     <!-- Confetti canvas clipped to card -->
     <canvas id="card-confetti"></canvas>
@@ -1057,8 +1096,19 @@
         <img src="photo.jpg" alt="Photo" class="hero-photo" id="heroPhoto" title="Tap me">
       </div>
       <div class="hero-text">
-        <div class="friends-style">SEASON : 20 - EPISODE : 26</div>
-        <div class="friends-style-small">THE • ONE • WHERE • HE • GRADUATE</div>
+        <div class="friends-style">
+          SEASON : 20
+          <span class="f-dot f-yellow" aria-hidden="true"></span>
+          EPISODE : 26
+        </div>
+        <div class="friends-style-small">
+          THE <span class="f-dot f-blue" aria-hidden="true"></span>
+          ONE <span class="f-dot f-red" aria-hidden="true"></span>
+          WHERE <span class="f-dot f-yellow" aria-hidden="true"></span>
+          HE
+          <br>
+          GRADUATE
+        </div>
       </div>
     </div>
 
@@ -1136,9 +1186,9 @@
 
         <div id="rsvpMessage" class="success-message"></div>
         <div id="rsvpError" class="error-message"></div>
-        <div id="deadlineMessage" class="deadline-warning is-hidden">RSVP is closed. The deadline (22 June 2026) has
+        <div id="deadlineMessage" class="deadline-warning is-hidden">RSVP is closed. The deadline (24 June 2026) has
           passed.</div>
-        <div class="deadline-note">Deadline to RSVP: <strong>22 June 2026</strong>.</div>
+        <div class="deadline-note">Deadline to RSVP: <strong>24 June 2026</strong>.</div>
       </div>
 
       <hr>
@@ -1157,7 +1207,7 @@
   </div>
 
   <script>
-    const RSVP_DEADLINE_ISO = "2026-06-22T23:59:59+03:00";
+    const RSVP_DEADLINE_ISO = "2026-06-24T23:59:59+03:00";
     const RSVP_DEADLINE = new Date(RSVP_DEADLINE_ISO);
     const EVENT_DATE = new Date(2026, 5, 27, 17, 0, 0);
     const GOLD = ['#d4af37', '#f5d742', '#b8860b', '#ffffff', '#e5c87b', '#fffacd'];
@@ -1299,12 +1349,36 @@
 
     // ── FALLING CONFETTI (disabled for card-like feel) ───
     function fallingConfetti() {
-      // Longer-lived particles so they reach the bottom of the card.
-      fireCardConfetti({ particleCount: 2, angle: 90, spread: 40, origin: { x: Math.random() * 0.3, y: 0 }, gravity: 0.95, scalar: 1.1, drift: 0.2, ticks: 900 });
-      fireCardConfetti({ particleCount: 3, angle: 90, spread: 60, origin: { x: 0.3 + Math.random() * 0.4, y: 0 }, gravity: 0.90, scalar: 1.0, drift: Math.random() * 0.5 - 0.25, ticks: 950 });
-      fireCardConfetti({ particleCount: 2, angle: 90, spread: 40, origin: { x: 0.7 + Math.random() * 0.3, y: 0 }, gravity: 0.95, scalar: 1.1, drift: -0.2, ticks: 900 });
+      // Light confetti drizzle (keep it subtle).
+      fireCardConfetti({ particleCount: 4, angle: 90, spread: 35, origin: { x: 0.1 + Math.random() * 0.2, y: 0 }, gravity: 0.95, scalar: 1.0, drift: 0.15, ticks: 650 });
+      fireCardConfetti({ particleCount: 5, angle: 90, spread: 55, origin: { x: 0.35 + Math.random() * 0.3, y: 0 }, gravity: 0.92, scalar: 0.95, drift: Math.random() * 0.3 - 0.15, ticks: 700 });
+      fireCardConfetti({ particleCount: 4, angle: 90, spread: 35, origin: { x: 0.7 + Math.random() * 0.2, y: 0 }, gravity: 0.95, scalar: 1.0, drift: -0.15, ticks: 650 });
     }
-    // Medium motion: no constant confetti drizzle.
+    // Small constant confetti drizzle (skip on reduced motion).
+    if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+      setInterval(() => {
+        if (document.hidden) return;
+        fallingConfetti();
+      }, 900);
+    }
+
+    // ── START GATE (user gesture enables sound) ──────────
+    (function () {
+      const overlay = document.getElementById('startOverlay');
+      const btn = document.getElementById('startBtn');
+      const audio = document.getElementById('bgMusic');
+      const page = document.getElementById('invitationPage');
+      if (!overlay || !btn) return;
+      async function start() {
+        if (audio) {
+          audio.muted = false;
+          try { await audio.play(); } catch { }
+        }
+        if (page) page.style.visibility = 'visible';
+        overlay.style.display = 'none';
+      }
+      btn.addEventListener('click', start);
+    })();
 
     // ── PHOTO CLICK → MEGA PARTY ─────────────────────────
     document.getElementById('heroPhoto').addEventListener('click', function () {

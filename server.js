@@ -5,7 +5,7 @@ const { MongoClient } = require('mongodb');
 
 const app = express();
 
-const RSVP_DEADLINE_ISO = process.env.RSVP_DEADLINE_ISO || '2026-06-22T23:59:59+03:00';
+const RSVP_DEADLINE_ISO = process.env.RSVP_DEADLINE_ISO || '2026-06-24T23:59:59+03:00';
 const RSVP_DEADLINE = new Date(RSVP_DEADLINE_ISO);
 
 const MONGODB_URI = process.env.MONGODB_URI;
