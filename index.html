@@ -914,6 +914,7 @@
       letter-spacing: 1px;
       color: #000;
       background: linear-gradient(180deg, rgba(245, 215, 66, 0.92), rgba(212, 175, 55, 0.88));
+      border-radius: 20px;
       border-top: 1px solid rgba(0, 0, 0, 0.25);
       border-bottom: 1px solid rgba(0, 0, 0, 0.25);
       padding: 1.05rem 1rem;
@@ -1061,6 +1062,232 @@
         animation: none !important;
       }
     }
+  /* --- CRAZY PARTY PROGRAM STYLES (only this section) --- */
+.crazy-program {
+  position: relative;
+  background: radial-gradient(circle at 20% 30%, #1a120b, #0a0502);
+  border-left: 8px solid var(--gold2);
+  overflow: hidden;
+  transition: all 0.2s;
+  animation: cardFlash 0.8s ease-out;
+}
+
+@keyframes cardFlash {
+  0% { transform: scale(0.96); opacity: 0; filter: blur(4px);}
+  100% { transform: scale(1); opacity: 1; filter: blur(0);}
+}
+
+.crazy-program h2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  animation: textShake 0.3s infinite alternate;
+}
+
+@keyframes textShake {
+  from { transform: translateX(-1px); }
+  to { transform: translateX(1px); }
+}
+
+.glitch-text {
+  font-size: 0.9rem;
+  background: #ff0066;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-family: monospace;
+  letter-spacing: 2px;
+  animation: glitchPulse 0.8s infinite;
+  box-shadow: 0 0 8px #ff0066;
+}
+
+@keyframes glitchPulse {
+  0% { opacity: 0.9; text-shadow: 0 0 0 #ff0066; }
+  50% { opacity: 1; text-shadow: 0 0 6px cyan; background: #ff33aa; }
+  100% { opacity: 0.9; }
+}
+
+/* GRADUATE SPOTLIGHT — INSANE */
+.graduate-spotlight {
+  background: linear-gradient(135deg, #2a1a0a, #1f0f00);
+  border-radius: 28px;
+  padding: 1.2rem;
+  margin: 1.5rem 0;
+  position: relative;
+  border: 1px solid gold;
+  box-shadow: 0 0 0 2px rgba(255,215,0,0.4), 0 0 0 6px rgba(255,100,0,0.2);
+  animation: spotlightPulse 1.2s infinite alternate;
+}
+
+@keyframes spotlightPulse {
+  0% { box-shadow: 0 0 0 2px rgba(255,215,0,0.3), 0 0 0 6px rgba(255,80,0,0.1); background: #2a1a0a; }
+  100% { box-shadow: 0 0 0 6px rgba(255,215,0,0.6), 0 0 0 14px rgba(255,80,0,0.4); background: #3f280e; }
+}
+
+.grad-crown {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.3rem;
+  background: linear-gradient(45deg, #ffcc44, #ffaa22);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+  margin-bottom: 12px;
+  letter-spacing: 2px;
+  animation: bounceCrown 0.5s infinite alternate;
+}
+
+@keyframes bounceCrown {
+  from { transform: translateY(0px);}
+  to { transform: translateY(-5px);}
+}
+
+.grad-line {
+  background: rgba(0,0,0,0.6);
+  border-radius: 60px;
+  padding: 10px 18px;
+  margin: 12px 0;
+  font-size: 1.25rem !important;
+  font-weight: bold;
+  justify-content: space-between;
+  border-left: 6px solid #ffcc44;
+  transition: all 0.2s;
+}
+
+.grad-line:hover {
+  transform: scale(1.02);
+  background: #000000aa;
+  border-left-color: #ffaa33;
+  box-shadow: 0 0 18px gold;
+}
+
+.grad-speech {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: textWave 0.6s infinite;
+}
+
+@keyframes textWave {
+  0%,100%{ letter-spacing: 0px; }
+  50%{ letter-spacing: 2px; text-shadow: 0 0 3px yellow; }
+}
+
+.fire-emoji {
+  animation: fireSpin 0.4s infinite alternate;
+  display: inline-block;
+}
+
+@keyframes fireSpin {
+  from { transform: rotate(-5deg) scale(1);}
+  to { transform: rotate(10deg) scale(1.2);}
+}
+
+/* Shockwave effect under graduate line */
+.shockwave-effect {
+  position: absolute;
+  bottom: -10px;
+  left: 10%;
+  width: 80%;
+  height: 3px;
+  background: radial-gradient(circle, #ffcc44, transparent);
+  animation: shockExpand 1s infinite;
+  opacity: 0.6;
+  border-radius: 50%;
+}
+
+@keyframes shockExpand {
+  0% { width: 0%; opacity: 1; left: 50%; transform: translateX(-50%);}
+  100% { width: 100%; opacity: 0; left: 0%;}
+}
+
+/* time styles (more intense) */
+.time {
+  background: #000000aa;
+  padding: 5px 12px;
+  border-radius: 100px;
+  font-weight: 800;
+  font-family: monospace;
+  font-size: 1.1rem;
+  color: #ffdd88;
+  box-shadow: 0 0 4px gold;
+  animation: timeGlow 1s infinite alternate;
+}
+
+@keyframes timeGlow {
+  from { box-shadow: 0 0 2px gold; background: #000000aa;}
+  to { box-shadow: 0 0 12px #ffaa33; background: #000000dd;}
+}
+
+.info-line {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 16px 0;
+  font-size: 1rem;
+  padding: 8px 12px;
+  border-radius: 40px;
+  transition: all 0.2s;
+  background: rgba(10,10,10,0.5);
+}
+
+.info-line:hover {
+  background: rgba(212,175,55,0.15);
+  transform: translateX(10px);
+  cursor: default;
+}
+
+.mega-line {
+  background: rgba(0,0,0,0.8);
+  border: 1px solid #ffaa44;
+  animation: megaPulse 0.9s infinite alternate;
+  font-size: 1.1rem;
+}
+
+@keyframes megaPulse {
+  from { border-color: #ffaa44; text-shadow: 0 0 0px white;}
+  to { border-color: #ff5500; text-shadow: 0 0 4px orange; background: #1e1005;}
+}
+
+/* PARTY ENERGY BAR — live! */
+.party-energy {
+  margin-top: 28px;
+  background: #171717;
+  border-radius: 100px;
+  padding: 6px 10px;
+  border: 1px solid #d4af37;
+}
+
+.energy-label {
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  color: #ffdd99;
+  margin-bottom: 6px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.energy-bar-fill {
+  height: 14px;
+  width: 0%;
+  background: linear-gradient(90deg, #ffaa33, #ff3388, #aa44ff);
+  border-radius: 40px;
+  animation: energyRave 2s infinite alternate ease-out;
+  box-shadow: 0 0 8px #ffaa44;
+}
+
+@keyframes energyRave {
+  0% { width: 20%; background-position: 0%;}
+  50% { width: 88%; background-position: 50%;}
+  100% { width: 100%; background: linear-gradient(90deg, #ff3388, #ffcc44, #33ffaa); background-size: 200%; animation: gradientShift 0.3s infinite;}
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0%;}
+  100% { background-position: 100%;}
+}
   </style>
 </head>
 
@@ -1132,15 +1359,22 @@
         <div class="info-line">Saturday, 27 June 2026</div>
         <div class="info-line">5:00 PM</div>
         <div class="info-line">Home in Ehmej</div>
-        <div class="info-line"><span class="dresscode">Dress code: Smart casual</span> – elegant & comfortable</div>
+        <div class="info-line"><span class="dresscode">Dress code: Smart casual</span> </div>
       </div>
 
-      <div class="info-card scroll-reveal">
-        <h2>Homemade Dinner</h2>
-        <p style="line-height:2.2;">
-          After the photos, we’re heading back home for a homemade dinner together. <br>Come hungry, come comfy, and let’s celebrate together.
-        </p>
-      </div>
+      <div class="party-program">
+  <div class="info-card scroll-reveal crazy-program">
+    <h2>PROGRAM</h2>
+
+    <!-- FULL TIMELINE WITH CRAZY EFFECTS -->
+    <div class="info-line"><span class="time">5:00 PM</span>Taking Photos — don't be late, light will GO WILD</div>
+    <div class="info-line"><span class="time">7:00 PM</span>Welcome & Introductions</div>
+    <div class="info-line"><span class="time">7:05 PM</span> One Minute Of Hope</div>
+    <div class="info-line mega-line"><span class="time">7:10 PM</span> Graduate Speech</div>
+    <div class="info-line"><span class="time">7:30 PM</span> Dinner (fuel for dancing)</div>
+    <div class="info-line"><span class="time">9:00 PM</span>Music & Dancing All Night</div>
+  </div>
+</div>
 
       <!-- RSVP -->
       <div class="rsvp-box scroll-reveal">
